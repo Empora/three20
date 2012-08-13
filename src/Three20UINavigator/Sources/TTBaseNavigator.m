@@ -41,6 +41,8 @@
 #import "Three20Core/NSDateAdditions.h"
 #import "Three20Core/TTAvailability.h"
 
+#import "Three20UICommon/TTGlobalUICommon.h"
+
 static TTBaseNavigator* gNavigator = nil;
 
 static NSString* kNavigatorHistoryKey           = @"TTNavigatorHistory";
@@ -143,13 +145,15 @@ __attribute__((weak_import));
        nil != controller;
        controller = controller.parentViewController) {
     if ([controller conformsToProtocol:@protocol(TTNavigatorRootContainer)]) {
-      container = (id<TTNavigatorRootContainer>)controller;
-      break;
+        container = (id<TTNavigatorRootContainer>)controller;
+        break;   
     }
 
     childController = controller;
   }
 
+
+    
   TTBaseNavigator* navigator = [container getNavigatorForController:childController];
   if (nil == navigator) {
     navigator = [TTBaseNavigator globalNavigator];

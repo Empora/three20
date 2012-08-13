@@ -105,9 +105,19 @@
   if (nil == _query) {
     _query = [[NSMutableDictionary alloc] init];
   }
-
-  id<TTURLPatternText> component = [self parseText:value];
-  [_query setObject:component forKey:name];
+  
+  // original  
+  // id<TTURLPatternText> component = [self parseText:value];
+  // [_query setObject:component forKey:name];
+    
+    // Mod by robert.biehl at fashionfreax dot net to support URLs like tt://search?(initWithFilterQuery:)  
+    if (value != [NSNull null]) {
+        id<TTURLPatternText> component = [self parseText:value];
+        [_query setObject:component forKey:name];
+    } else {
+        id<TTURLPatternText> component = [self parseText:name];
+        [_query setObject:component forKey:name];
+    }
 }
 
 

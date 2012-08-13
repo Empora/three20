@@ -302,23 +302,25 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)showProgress:(CGFloat)progress {
+    /*
   if (progress >= 0) {
     if (!_statusSpinner) {
       _statusSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:
         UIActivityIndicatorViewStyleWhiteLarge];
-      [self addSubview:_statusSpinner];
+        [self addSubview:_statusSpinner];
+        //[self sendSubviewToBack:_statusSpinner];
+        _statusSpinner.hidesWhenStopped = YES;
     }
 
     [_statusSpinner startAnimating];
-    _statusSpinner.hidden = NO;
     [self showStatus:nil];
     [self setNeedsLayout];
 
   } else {
     [_statusSpinner stopAnimating];
-    _statusSpinner.hidden = YES;
     _captionLabel.hidden = !!_statusLabel.text.length;
   }
+     */
 }
 
 

@@ -796,7 +796,7 @@ static const NSInteger kActivityLabelTag          = 96;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)scrollView:(TTScrollView*)scrollView didMoveToPageAtIndex:(NSInteger)pageIndex {
   if (pageIndex != _centerPhotoIndex) {
-    [self moveToPhotoAtIndex:pageIndex withDelay:YES];
+    [self moveToPhotoAtIndex:pageIndex withDelay:NO];//YES
     [self refresh];
   }
 }
