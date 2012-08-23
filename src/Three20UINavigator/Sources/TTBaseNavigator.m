@@ -150,10 +150,9 @@ __attribute__((weak_import));
     }
 
     childController = controller;
+    NSLog(@"vc: %@, container: %@", childController, container);
   }
 
-
-    
   TTBaseNavigator* navigator = [container getNavigatorForController:childController];
   if (nil == navigator) {
     navigator = [TTBaseNavigator globalNavigator];

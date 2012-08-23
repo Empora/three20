@@ -453,7 +453,9 @@ static TTURLRequestQueue* gMainQueue = nil;
 - (void)cancelRequestsWithDelegate:(id)delegate {
   NSMutableArray* requestsToCancel = nil;
 
-  for (TTRequestLoader* loader in [_loaders objectEnumerator]) {
+    NSDictionary* loadersCopy = [_loaders copy];
+    
+  for (TTRequestLoader* loader in [loadersCopy objectEnumerator]) {
     for (TTURLRequest* request in loader.requests) {
       for (id<TTURLRequestDelegate> requestDelegate in request.delegates) {
         if (delegate == requestDelegate) {
