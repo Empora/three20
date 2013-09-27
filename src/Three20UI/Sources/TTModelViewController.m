@@ -62,7 +62,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)dealloc {
   [_model.delegates removeObject:self];
-  TT_RELEASE_SAFELY(_model);
+//  TT_RELEASE_SAFELY(_model);
+    [_model release];
   TT_RELEASE_SAFELY(_modelError);
   [super dealloc];
 }
@@ -348,7 +349,6 @@
       _flags.isModelDidLoadFirstTimeInvalid = NO;
       _flags.isModelDidShowFirstTimeInvalid = YES;
     }
-
     [self refresh];
   }
 }

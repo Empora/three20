@@ -43,6 +43,8 @@
 #import "Three20Core/TTDebugFlags.h"
 #import "Three20Core/TTGlobalCoreRects.h"
 
+#import "Three20UINavigator/TTGlobalNavigatorMetrics.h"
+
 static const CGFloat kMargin = 0.0f;
 static const CGFloat kPadding = 0.0f;
 static const CGFloat kPromptMargin = 40.0f;
@@ -140,7 +142,12 @@ static const NSInteger kDefaultColumnCount = 3;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (CGFloat)rowHeight {
-  return round(_scrollView.height / 3);
+    
+    CGRect bounds = TTScreenBounds();
+    if(bounds.size.height > 480.0){
+        return round(_scrollView.height / 4);
+    }
+    return round(_scrollView.height / 3);
 }
 
 

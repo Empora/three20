@@ -97,6 +97,8 @@ static CGFloat kPadding = 5.0f;
   TT_RELEASE_SAFELY(_defaultText);
   TT_RELEASE_SAFELY(_footerBar);
   TT_RELEASE_SAFELY(_previousRightBarButtonItem);
+    
+    _textEditor.delegate = nil;
 
   [super dealloc];
 }
@@ -120,7 +122,7 @@ static CGFloat kPadding = 5.0f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)dismissAnimationDidStop {
-  [self release];
+  //[self release];
 }
 
 
@@ -208,7 +210,11 @@ static CGFloat kPadding = 5.0f;
   if (delegate) {
     [state setObject:delegate forKey:@"delegate"];
   }
-  [state setObject:_textEditor.text forKey:@"text"];
+    // Robert Biehl <robert.biehl@fashionfreax.net>
+    if (_textEditor.text) {
+        [state setObject:_textEditor.text forKey:@"text"];
+    }
+
 
   NSString* title = self.navigationItem.title;
 
@@ -283,7 +289,7 @@ static CGFloat kPadding = 5.0f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)textEditorDidBeginEditing:(TTTextEditor*)textEditor {
-  [self retain];
+//  [self retain];
 
   _originTop = self.view.top;
 

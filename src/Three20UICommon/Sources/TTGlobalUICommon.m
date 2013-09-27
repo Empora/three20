@@ -61,6 +61,9 @@ BOOL TTOSVersionIsAtLeast(float version) {
   // Floating-point comparison is pretty bad, so let's cut it some slack with an epsilon.
   static const CGFloat kEpsilon = 0.0000001f;
 
+#ifdef __IPHONE_7_0
+    return 7.0 - version >= -kEpsilon;
+#endif
 #ifdef __IPHONE_6_0
     return 6.0 - version >= -kEpsilon;
 #endif

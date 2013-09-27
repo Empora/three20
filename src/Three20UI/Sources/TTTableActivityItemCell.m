@@ -23,6 +23,9 @@
 // Core
 #import "Three20Core/TTCorePreprocessorMacros.h"
 
+// Common
+#import "Three20UICommon/TTGlobalUICommon.h"
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,9 +69,8 @@
   [super layoutSubviews];
 
   UITableView* tableView = (UITableView*)self.superview;
-  if (tableView.style == UITableViewStylePlain) {
-    _activityLabel.frame = self.contentView.bounds;
-
+  if (TTRuntimeOSVersionIsAtLeast(7.0) || tableView.style == UITableViewStylePlain) {
+      _activityLabel.frame = self.contentView.bounds;
   } else {
     _activityLabel.frame = CGRectInset(self.contentView.bounds, -1, -1);
   }

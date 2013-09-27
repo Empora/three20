@@ -142,7 +142,6 @@
   }
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)imageViewDidStartLoad {
   [self showProgress:0];
@@ -180,7 +179,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)layoutSubviews {
-  CGRect screenBounds = TTScreenBounds();
+  CGRect screenBounds = self.superview.bounds;
   CGFloat width = self.width;
   CGFloat height = self.height;
   CGFloat cx = self.bounds.origin.x + width/2;
@@ -302,7 +301,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)showProgress:(CGFloat)progress {
-    /*
   if (progress >= 0) {
     if (!_statusSpinner) {
       _statusSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:
@@ -320,7 +318,6 @@
     [_statusSpinner stopAnimating];
     _captionLabel.hidden = !!_statusLabel.text.length;
   }
-     */
 }
 
 

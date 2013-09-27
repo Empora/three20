@@ -150,7 +150,6 @@ __attribute__((weak_import));
     }
 
     childController = controller;
-    NSLog(@"vc: %@, container: %@", childController, container);
   }
 
   TTBaseNavigator* navigator = [container getNavigatorForController:childController];
@@ -253,7 +252,8 @@ __attribute__((weak_import));
       [_rootContainer navigator:self setRootViewController:_rootViewController];
 
     } else {
-      [self.window addSubview:_rootViewController.view];
+        self.window.rootViewController = _rootViewController;
+//      [self.window addSubview:_rootViewController.view];
     }
   }
 }
@@ -284,6 +284,8 @@ __attribute__((weak_import));
       return [self openURLAction:[TTURLAction actionWithURLPath:parentURLPath]];
 
     } else {
+        // HERE
+        
       UIViewController* parent = self.topViewController;
       if (parent != controller) {
         return parent;
@@ -435,7 +437,11 @@ __attribute__((weak_import));
                            mode: TTNavigationModeNone
                          action: [TTURLAction actionWithURLPath:nil]];
       }
-
+        /*
+        if (parentController == topViewController && action.sourceView) {
+            parentController = action.sourceView.viewController;
+        }
+*/
       didPresentNewController = [self
                                  presentController: controller
                                  parentController: parentController

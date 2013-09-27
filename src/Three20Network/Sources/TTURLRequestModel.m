@@ -34,7 +34,6 @@
 @synthesize cacheKey    = _cacheKey;
 @synthesize hasNoMore   = _hasNoMore;
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)dealloc {
   [[TTURLRequestQueue mainQueue] cancelRequestsWithDelegate:self];

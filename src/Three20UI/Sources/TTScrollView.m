@@ -233,6 +233,10 @@ static const CGFloat kFrameDuration = 1.0/40.0f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (CGFloat)zoomFactor {
+    if(self.pageWidth==0){
+        return 0.0;
+    }
+    
   return self.stretchedWidth / self.pageWidth;
 }
 
@@ -576,8 +580,8 @@ static const CGFloat kFrameDuration = 1.0/40.0f;
         [UIView setAnimationDuration:_centerPageAnimationDuration];
       }
 
-      page.frame = CGRectMake(offset.x + frame.origin.x, offset.y + frame.origin.y,
-        frame.size.width, frame.size.height);
+      page.frame = CGRectMake(round(offset.x + frame.origin.x), round(offset.y + frame.origin.y),
+        round(frame.size.width), round(frame.size.height));
 
       // Should animate the relayout?
       if ( _nextLayoutAnimated ) {
@@ -1471,6 +1475,7 @@ static const CGFloat kFrameDuration = 1.0/40.0f;
     } else if ( _touchCount == 1 ) {
       newEdges  = UIEdgeInsetsMake(top, left, bottom, right);
       pageEdges = [self resistPageEdges:newEdges];
+        
       _executingZoomGesture = NO;
     }
 
