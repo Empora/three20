@@ -1473,10 +1473,10 @@ static const CGFloat kFrameDuration = 1.0/40.0f;
     // Dragging.
 
     } else if ( _touchCount == 1 ) {
-      newEdges  = UIEdgeInsetsMake(top, left, bottom, right);
-      pageEdges = [self resistPageEdges:newEdges];
+        newEdges  = UIEdgeInsetsMake(top, left, bottom, right);
+        pageEdges = [self resistPageEdges:newEdges];
         
-      _executingZoomGesture = NO;
+        _executingZoomGesture = NO;
     }
 
     // Calculate distance. (Speed).

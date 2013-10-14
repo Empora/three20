@@ -154,13 +154,7 @@
   _hasViewAppeared = YES;
 
   if (!self.popupViewController) {
-    UINavigationBar* bar = self.navigationController.navigationBar;
-//    bar.tintColor = _navigationBarTintColor;
-//    bar.barStyle = _navigationBarStyle;
-
-/*    if (!TTIsPad()) {
-      [[UIApplication sharedApplication] setStatusBarStyle:_statusBarStyle animated:YES];
-    }*/
+      
   }
 }
 

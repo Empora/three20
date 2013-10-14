@@ -102,16 +102,15 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)parseParameter:(NSString*)name value:(NSString*)value {
-  if (nil == _query) {
-    _query = [[NSMutableDictionary alloc] init];
-  }
-  
-  // original  
-  // id<TTURLPatternText> component = [self parseText:value];
-  // [_query setObject:component forKey:name];
+    if (nil == _query) {
+        _query = [[NSMutableDictionary alloc] init];
+    }
+    // original
+    // id<TTURLPatternText> component = [self parseText:value];
+    // [_query setObject:component forKey:name];
     
-    // Mod by robert.biehl at fashionfreax dot net to support URLs like tt://search?(initWithFilterQuery:)  
-    if (value != [NSNull null]) {
+    // Mod by robert.biehl at fashionfreax dot net to support URLs like tt://search?(initWithFilterQuery:)
+    if ((id)value != [NSNull null] && value != nil) {
         id<TTURLPatternText> component = [self parseText:value];
         [_query setObject:component forKey:name];
     } else {

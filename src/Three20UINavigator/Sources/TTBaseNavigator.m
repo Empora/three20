@@ -146,7 +146,7 @@ __attribute__((weak_import));
        controller = controller.parentViewController) {
     if ([controller conformsToProtocol:@protocol(TTNavigatorRootContainer)]) {
         container = (id<TTNavigatorRootContainer>)controller;
-        break;   
+        break;
     }
 
     childController = controller;
@@ -286,13 +286,13 @@ __attribute__((weak_import));
     } else {
         // HERE
         
-      UIViewController* parent = self.topViewController;
-      if (parent != controller) {
-        return parent;
-
-      } else {
-        return nil;
-      }
+        UIViewController* parent = self.topViewController;
+        if (parent != controller) {
+            return parent;
+            
+        } else {
+            return nil;
+        }
     }
   }
 }
