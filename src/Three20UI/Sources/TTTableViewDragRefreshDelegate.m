@@ -54,6 +54,14 @@ static const CGFloat kHeaderVisibleHeight = 60.0f;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+@interface TTTableViewDragRefreshDelegate(){
+    CGFloat headerVisibleHeight;
+    BOOL _dragToRefreshEnabled;
+}
+
+@end
+
 @implementation TTTableViewDragRefreshDelegate
 
 @synthesize headerView = _headerView;
@@ -67,44 +75,56 @@ static const CGFloat kHeaderVisibleHeight = 60.0f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (id)initWithController:(TTTableViewController*)controller {
-	self = [super initWithController:controller];
-  if (self) {
-    // Add our refresh header
-    _headerView = [[TTTableHeaderDragRefreshView alloc]
-                          initWithFrame:CGRectMake(0,
-                                                   -_controller.tableView.bounds.size.height,
-                                                   _controller.tableView.width,
-                                                   _controller.tableView.bounds.size.height)];
-    _headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    _headerView.backgroundColor = TTSTYLEVAR(tableRefreshHeaderBackgroundColor);
-    [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
-    [_controller.tableView addSubview:_headerView];
-
-    // Hook up to the model to listen for changes.
-    _model = [controller.model retain];
-    [_model.delegates addObject:self];
-
-    // Grab the last refresh date if there is one.
-    if ([_model respondsToSelector:@selector(loadedTime)]) {
-      NSDate* date = [_model performSelector:@selector(loadedTime)];
-
-      if (nil != date) {
-        [_headerView setUpdateDate:date];
-      }
+    self = [super initWithController:controller];
+    if (self) {
+        
+        _dragToRefreshEnabled = !TTRuntimeOSVersionIsAtLeast(7.0);
+        
+        if(_dragToRefreshEnabled){
+            // Add our refresh header
+            _headerView = [[TTTableHeaderDragRefreshView alloc]
+                           initWithFrame:CGRectMake(0,
+                                                    -_controller.tableView.bounds.size.height,
+                                                    _controller.tableView.width,
+                                                    _controller.tableView.bounds.size.height)];
+            _headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+            _headerView.backgroundColor = TTSTYLEVAR(tableRefreshHeaderBackgroundColor);
+            [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
+            [_controller.tableView addSubview:_headerView];
+            
+            // Hook up to the model to listen for changes.
+            _model = [controller.model retain];
+            [_model.delegates addObject:self];
+            
+            // Grab the last refresh date if there is one.
+            if ([_model respondsToSelector:@selector(loadedTime)]) {
+                NSDate* date = [_model performSelector:@selector(loadedTime)];
+                
+                if (nil != date) {
+                    [_headerView setUpdateDate:date];
+                }
+            }
+        }
+        // Hook up delegate
+        if ([_controller conformsToProtocol:@protocol(UITableViewDelegate)]) {
+            _orgDelegate = (id<UITableViewDelegate>)_controller;
+        }
     }
-  }
-  return self;
+    return self;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)dealloc {
-  [_model.delegates removeObject:self];
-  [_headerView removeFromSuperview];
-  TT_RELEASE_SAFELY(_headerView);
-  TT_RELEASE_SAFELY(_model);
-
-  [super dealloc];
+    [_model.delegates removeObject:self];
+    [_headerView removeFromSuperview];
+    TT_RELEASE_SAFELY(_headerView);
+    TT_RELEASE_SAFELY(_model);
+    
+    _orgDelegate=nil;
+    TT_RELEASE_SAFELY(_orgDelegate);
+    
+    [super dealloc];
 }
 
 
@@ -116,43 +136,110 @@ static const CGFloat kHeaderVisibleHeight = 60.0f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)scrollViewDidScroll:(UIScrollView*)scrollView {
-  [super scrollViewDidScroll:scrollView];
-
-  if (scrollView.dragging && !_model.isLoading) {
-    if (scrollView.contentOffset.y > kRefreshDeltaY
-        && scrollView.contentOffset.y < 0.0f) {
-      [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
-
-    } else if (scrollView.contentOffset.y < kRefreshDeltaY) {
-      [_headerView setStatus:TTTableHeaderDragRefreshReleaseToReload];
+    [super scrollViewDidScroll:scrollView];
+    
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewDidScroll:)]) {
+        [_orgDelegate scrollViewDidScroll:scrollView];
     }
-  }
-
-  // This is to prevent odd behavior with plain table section headers. They are affected by the
-  // content inset, so if the table is scrolled such that there might be a section header abutting
-  // the top, we need to clear the content inset.
-  if (_model.isLoading) {
-    if (scrollView.contentOffset.y >= 0) {
-      _controller.tableView.contentInset = UIEdgeInsetsZero;
-
-    } else if (scrollView.contentOffset.y < 0) {
-      _controller.tableView.contentInset = UIEdgeInsetsMake(kHeaderVisibleHeight, 0, 0, 0);
+    
+    if (scrollView.dragging && !_model.isLoading) {
+        if (scrollView.contentOffset.y > kRefreshDeltaY
+            && scrollView.contentOffset.y < 0.0f) {
+            [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
+            
+        } else if (scrollView.contentOffset.y < kRefreshDeltaY) {
+            [_headerView setStatus:TTTableHeaderDragRefreshReleaseToReload];
+        }
     }
-  }
+    
+    // This is to prevent odd behavior with plain table section headers. They are affected by the
+    // content inset, so if the table is scrolled such that there might be a section header abutting
+    // the top, we need to clear the content inset.
+    if (_model.isLoading) {
+        if (scrollView.contentOffset.y >= 0) {
+            _controller.tableView.contentInset = UIEdgeInsetsZero;
+            
+        } else if (scrollView.contentOffset.y < 0) {
+            _controller.tableView.contentInset = UIEdgeInsetsMake(kHeaderVisibleHeight, 0, 0, 0);
+        }
+    }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)scrollViewDidEndDragging:(UIScrollView*)scrollView willDecelerate:(BOOL)decelerate {
-  [super scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
+    [super scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
+    
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)]) {
+        [_orgDelegate scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
+    }
+    
+    // If dragging ends and we are far enough to be fully showing the header view trigger a
+    // load as long as we arent loading already
+    if (scrollView.contentOffset.y <= kRefreshDeltaY && !_model.isLoading) {
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:@"DragRefreshTableReload" object:nil];
+        [_model load:TTURLRequestCachePolicyNetwork more:NO];
+    }
+}
 
-  // If dragging ends and we are far enough to be fully showing the header view trigger a
-  // load as long as we arent loading already
-  if (scrollView.contentOffset.y <= kRefreshDeltaY && !_model.isLoading) {
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:@"DragRefreshTableReload" object:nil];
-    [_model load:TTURLRequestCachePolicyNetwork more:NO];
-  }
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewDidZoom:)]) {
+        [_orgDelegate scrollViewDidZoom:scrollView];
+    }
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)]) {
+        [_orgDelegate scrollViewWillBeginDragging:scrollView];
+    }
+}
+
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewWillBeginDecelerating:)]) {
+        [_orgDelegate scrollViewWillBeginDecelerating:scrollView];
+    }
+}
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)]) {
+        [_orgDelegate scrollViewDidEndDecelerating:scrollView];
+    }
+}
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewDidEndScrollingAnimation:)]) {
+        [_orgDelegate scrollViewDidEndScrollingAnimation:scrollView];
+    }
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(viewForZoomingInScrollView:)]) {
+        return [_orgDelegate viewForZoomingInScrollView:scrollView];
+    }
+    return nil;
+}
+- (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewWillBeginZooming:withView:)]) {
+        [_orgDelegate scrollViewWillBeginZooming:scrollView withView:view];
+    }
+}
+
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewDidEndZooming:withView:atScale:)]) {
+        [_orgDelegate scrollViewDidEndZooming:scrollView withView:view atScale:scale];
+    }
+}
+
+- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewShouldScrollToTop:)]) {
+        return [_orgDelegate scrollViewShouldScrollToTop:scrollView];
+    }
+    return YES;
+}
+- (void)scrollViewDidScrollToTop:(UIScrollView *)scrollView{
+    if (_orgDelegate && [_orgDelegate respondsToSelector:@selector(scrollViewDidScrollToTop:)]) {
+        [_orgDelegate scrollViewDidScrollToTop:scrollView];
+    }
 }
 
 
@@ -164,55 +251,63 @@ static const CGFloat kHeaderVisibleHeight = 60.0f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)modelDidStartLoad:(id<TTModel>)model {
-  [_headerView setStatus:TTTableHeaderDragRefreshLoading];
-
-  [UIView beginAnimations:nil context:NULL];
-  [UIView setAnimationDuration:ttkDefaultFastTransitionDuration];
-  if (_controller.tableView.contentOffset.y < 0) {
-    _controller.tableView.contentInset = UIEdgeInsetsMake(kHeaderVisibleHeight, 0.0f, 0.0f, 0.0f);
-  }
-  [UIView commitAnimations];
+    if (_dragToRefreshEnabled) {
+        [_headerView setStatus:TTTableHeaderDragRefreshLoading];
+        
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:ttkDefaultFastTransitionDuration];
+        if (_controller.tableView.contentOffset.y < 0) {
+            _controller.tableView.contentInset = UIEdgeInsetsMake(kHeaderVisibleHeight, 0.0f, 0.0f, 0.0f);
+        }
+        [UIView commitAnimations];
+    }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)modelDidFinishLoad:(id<TTModel>)model {
-  [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
-
-  [UIView beginAnimations:nil context:NULL];
-  [UIView setAnimationDuration:ttkDefaultTransitionDuration];
-  _controller.tableView.contentInset = UIEdgeInsetsZero;
-  [UIView commitAnimations];
-
-  if ([model respondsToSelector:@selector(loadedTime)]) {
-    NSDate* date = [model performSelector:@selector(loadedTime)];
-    [_headerView setUpdateDate:date];
-
-  } else {
-    [_headerView setCurrentDate];
-  }
+    if (_dragToRefreshEnabled) {
+        [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
+        
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:ttkDefaultTransitionDuration];
+        _controller.tableView.contentInset = UIEdgeInsetsZero;
+        [UIView commitAnimations];
+        
+        if ([model respondsToSelector:@selector(loadedTime)]) {
+            NSDate* date = [model performSelector:@selector(loadedTime)];
+            [_headerView setUpdateDate:date];
+            
+        } else {
+            [_headerView setCurrentDate];
+        }
+    }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)model:(id<TTModel>)model didFailLoadWithError:(NSError*)error {
-  [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
-
-  [UIView beginAnimations:nil context:NULL];
-  [UIView setAnimationDuration:ttkDefaultTransitionDuration];
-  _controller.tableView.contentInset = UIEdgeInsetsZero;
-  [UIView commitAnimations];
+    if (_dragToRefreshEnabled) {
+        [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
+        
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:ttkDefaultTransitionDuration];
+        _controller.tableView.contentInset = UIEdgeInsetsZero;
+        [UIView commitAnimations];
+    }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)modelDidCancelLoad:(id<TTModel>)model {
-  [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
-
-  [UIView beginAnimations:nil context:NULL];
-  [UIView setAnimationDuration:ttkDefaultTransitionDuration];
-  _controller.tableView.contentInset = UIEdgeInsetsZero;
-  [UIView commitAnimations];
+    if (_dragToRefreshEnabled) {
+        [_headerView setStatus:TTTableHeaderDragRefreshPullToReload];
+        
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:ttkDefaultTransitionDuration];
+        _controller.tableView.contentInset = UIEdgeInsetsZero;
+        [UIView commitAnimations];
+    }
 }
 
 

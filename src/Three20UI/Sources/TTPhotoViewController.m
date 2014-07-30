@@ -88,7 +88,7 @@ static const NSInteger kActivityLabelTag          = 96;
     self.wantsFullScreenLayout = YES;
     self.hidesBottomBarWhenPushed = YES;
 
-    self.defaultImage = TTIMAGE(@"bundle://Three20.bundle/images/photoDefault.png");
+    self.defaultImage = [UIImage imageNamed:@"Three20.bundle/images/photoDefault"];
   }
 
   return self;
@@ -512,13 +512,13 @@ static const NSInteger kActivityLabelTag          = 96;
   [_innerView addSubview:_scrollView];
 
   _nextButton =
-    [[UIBarButtonItem alloc] initWithImage:TTIMAGE(@"bundle://Three20.bundle/images/nextIcon.png")
+    [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Three20.bundle/images/nextIcon"]
                                      style:UIBarButtonItemStylePlain
                                     target:self
                                     action:@selector(nextAction)];
   _previousButton =
     [[UIBarButtonItem alloc] initWithImage:
-     TTIMAGE(@"bundle://Three20.bundle/images/previousIcon.png")
+     [UIImage imageNamed:@"Three20.bundle/images/previousIcon"]
                                      style:UIBarButtonItemStylePlain
                                     target:self
                                     action:@selector(previousAction)];

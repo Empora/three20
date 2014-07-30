@@ -204,7 +204,7 @@ static CGFloat kThumbSpacing = 4.0f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (UIImage*)imageForError:(NSError*)error {
-  return TTIMAGE(@"bundle://Three20.bundle/images/photoDefault.png");
+  return [UIImage imageNamed:@"Three20.bundle/images/photoDefault"];
 }
 
 

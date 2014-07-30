@@ -36,6 +36,10 @@
 @interface TTTableViewDragRefreshDelegate : TTTableViewVarHeightDelegate {
   TTTableHeaderDragRefreshView* _headerView;
   id<TTModel>                   _model;
+    
+    
+    id<UIScrollViewDelegate>        _orgDelegate;
+
 }
 
 @property (nonatomic, retain) TTTableHeaderDragRefreshView* headerView;

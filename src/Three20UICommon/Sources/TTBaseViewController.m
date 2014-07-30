@@ -152,10 +152,6 @@
 
   _isViewAppearing = YES;
   _hasViewAppeared = YES;
-
-  if (!self.popupViewController) {
-      
-  }
 }
 
 

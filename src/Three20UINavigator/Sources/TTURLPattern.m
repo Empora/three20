@@ -108,11 +108,11 @@
     // original
     // id<TTURLPatternText> component = [self parseText:value];
     // [_query setObject:component forKey:name];
-    
     // Mod by robert.biehl at fashionfreax dot net to support URLs like tt://search?(initWithFilterQuery:)
     if ((id)value != [NSNull null] && value != nil) {
         id<TTURLPatternText> component = [self parseText:value];
         [_query setObject:component forKey:name];
+        
     } else {
         id<TTURLPatternText> component = [self parseText:name];
         [_query setObject:component forKey:name];

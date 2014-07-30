@@ -39,10 +39,16 @@
   [[TTURLRequestQueue mainQueue] cancelRequestsWithDelegate:self];
   [_loadingRequest cancel];
 
+    if ([_loadingRequest isLoading]) {
+    //    NSLog(@"CANCEL FAILED");
+    }
+
+    [_loadingRequest.delegates removeObject:self];
+    
   TT_RELEASE_SAFELY(_loadingRequest);
   TT_RELEASE_SAFELY(_loadedTime);
   TT_RELEASE_SAFELY(_cacheKey);
-
+    
   [super dealloc];
 }
 
@@ -125,6 +131,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)requestDidStartLoad:(TTURLRequest*)request {
+    //NSLog(@"releasing _loadingRequest retainCount:%d", [_loadingRequest retainCount]);
   [_loadingRequest release];
   _loadingRequest = [request retain];
   [self didStartLoad];

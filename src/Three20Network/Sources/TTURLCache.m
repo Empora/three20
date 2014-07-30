@@ -506,7 +506,9 @@ static NSMutableDictionary* gNamedCaches = nil;
   if (!_disableDiskCache) {
     NSString* filePath = [self cachePathForKey:key];
     NSFileManager* fm = [NSFileManager defaultManager];
+      //NSLog(@"write start ---->");
     [fm createFileAtPath:filePath contents:data attributes:nil];
+            //NSLog(@"write close <----");
   }
 }
 

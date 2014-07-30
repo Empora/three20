@@ -464,6 +464,9 @@ __attribute__((weak_import));
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (UIViewController*)openURLAction:(TTURLAction*)action {
+#ifdef DEBUG
+    [NSException raise:@"DeprecatedException" format:@"openURLAction is deprecated."];
+#endif
   if (nil == action || nil == action.urlPath) {
     return nil;
   }
