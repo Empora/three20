@@ -41,11 +41,13 @@ UIInterfaceOrientation TTInterfaceOrientation() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 CGRect TTScreenBounds() {
   CGRect bounds = [UIScreen mainScreen].bounds;
-  if (UIInterfaceOrientationIsLandscape(TTInterfaceOrientation())) {
-    CGFloat width = bounds.size.width;
-    bounds.size.width = bounds.size.height;
-    bounds.size.height = width;
-  }
+    if (!TTRuntimeOSVersionIsAtLeast(8.0)) {
+        if (UIInterfaceOrientationIsLandscape(TTInterfaceOrientation())) {
+            CGFloat width = bounds.size.width;
+            bounds.size.width = bounds.size.height;
+            bounds.size.height = width;
+        }
+    }
   return bounds;
 }
 
